@@ -1,6 +1,6 @@
-# const_lisp
+# cons_lisp
 
-> My prime Nuxt.js project
+> My rad Nuxt.js project
 
 ## Build Setup
 

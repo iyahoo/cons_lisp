@@ -1,7 +1,7 @@
 const pkg = require('./package')
 
 module.exports = {
-   mode: 'spa',
+   mode: 'universal',
 
    /*
     ** Headers of the page
@@ -24,7 +24,7 @@ module.exports = {
    /*
     ** Global CSS
     */
-   css: ['assets/main.css'],
+   css: [],
 
    /*
     ** Plugins to load before mounting the App
@@ -34,7 +34,16 @@ module.exports = {
    /*
     ** Nuxt.js modules
     */
-   modules: [],
+   modules: [
+      // Doc: https://github.com/nuxt-community/axios-module#usage
+      '@nuxtjs/axios',
+   ],
+   /*
+    ** Axios module configuration
+    */
+   axios: {
+      // See https://github.com/nuxt-community/axios-module#options
+   },
 
    /*
     ** Build configuration
