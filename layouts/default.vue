@@ -2,5 +2,4 @@
    <div><nuxt /></div>
 </template>
 
-<style>
-</style>
+<style></style>
