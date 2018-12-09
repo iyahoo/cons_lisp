@@ -37,12 +37,29 @@ module.exports = {
    modules: [
       // Doc: https://github.com/nuxt-community/axios-module#usage
       '@nuxtjs/axios',
+      '@nuxtjs/vuetify',
    ],
    /*
     ** Axios module configuration
     */
    axios: {
       // See https://github.com/nuxt-community/axios-module#options
+   },
+
+   /*
+    ** Vuetify module configuration
+    */
+   vuetify: {
+      iconfont: 'fa',
+      theme: {
+         primary: '#1976D2',
+         secondary: '#424242',
+         accent: '#82B1FF',
+         error: '#FF5252',
+         info: '#2196F3',
+         success: '#4CAF50',
+         warning: '#FFC107',
+      },
    },
 
    /*
