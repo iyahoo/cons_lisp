@@ -10,7 +10,7 @@
             rows="1"
             id="inputArea"
          />
-         <v-text-field :value="output" label="Output" outline readonly />
+         <v-text-field :value="output()" label="Output" outline readonly />
       </div>
    </section>
 </template>
@@ -18,24 +18,30 @@
 <script>
 export default {
    methods: {
-      setCursor: val => {
+      setCursor(val) {
          const inputArea = document.getElementById('inputArea')
          inputArea.setSelectionRange(val, val)
       },
-   },
-   computed: {
+
+      checkExp(exp) {
+         if (exp === '()') {
+            this.setCursor(1)
+         }
+      },
+
       output() {
          if (this.exp === '(') {
             this.exp = '()'
          }
 
-         if (this.exp === '()') {
-            this.setCursor(1)
-         }
-
          return this.exp
       },
    },
+
+	updated () {
+		this.checkExp(this.exp)
+	},
+
    data: () => ({
       exp: '',
    }),
