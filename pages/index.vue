@@ -10,7 +10,7 @@
             rows="1"
             id="inputArea"
          />
-         <v-text-field :value="ide" label="Output" outline readonly />
+         <v-text-field :value="forming" label="Output" outline readonly />
       </div>
    </section>
 </template>
@@ -30,7 +30,7 @@ export default {
       },
    },
    computed: {
-      ide() {
+      forming() {
          if (this.exp === '(') {
             this.exp = '()'
          }
