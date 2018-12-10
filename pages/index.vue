@@ -8,15 +8,36 @@
             color="deep-purple"
             label="input"
             rows="1"
+            id="inputArea"
          />
+         <v-text-field :value="output" label="Output" outline readonly />
       </div>
    </section>
 </template>
 
 <script>
 export default {
+   methods: {
+      setCursor: val => {
+         const inputArea = document.getElementById('inputArea')
+         inputArea.setSelectionRange(val, val)
+      },
+   },
+   computed: {
+      output() {
+         if (this.exp === '(') {
+            this.exp = '()'
+         }
+
+         if (this.exp === '()') {
+            this.setCursor(1)
+         }
+
+         return this.exp
+      },
+   },
    data: () => ({
-      exp: '(+ 1 1)',
+      exp: '',
    }),
 }
 </script>
