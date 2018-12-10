@@ -10,7 +10,7 @@
             rows="1"
             id="inputArea"
          />
-         <v-text-field :value="output()" label="Output" outline readonly />
+         <v-text-field :value="output" label="Output" outline readonly />
       </div>
    </section>
 </template>
@@ -28,7 +28,8 @@ export default {
             this.setCursor(1)
          }
       },
-
+   },
+   computed: {
       output() {
          if (this.exp === '(') {
             this.exp = '()'
@@ -38,9 +39,9 @@ export default {
       },
    },
 
-	updated () {
-		this.checkExp(this.exp)
-	},
+   updated() {
+      this.checkExp(this.exp)
+   },
 
    data: () => ({
       exp: '',
