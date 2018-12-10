@@ -35,6 +35,10 @@ export default {
             this.exp = '()'
          }
 
+         if (this.exp === ')') {
+            this.exp = ''
+         }
+
          return this.exp
       },
    },
