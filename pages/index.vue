@@ -2,7 +2,7 @@
    <section class="container">
       <div>
          <v-textarea
-            v-model="exp"
+            v-model="inputstr"
             auto-grow
             box
             color="deep-purple"
@@ -10,7 +10,13 @@
             rows="1"
             id="inputArea"
          />
-         <v-text-field :value="forming" label="Output" outline readonly />
+         <v-text-field :value="eval" label="Output" outline readonly />
+         <v-text-field
+            :value="parsed(parser({ parsed: null, rest: this.inputstr }))"
+            label="test"
+            outline
+            readonly
+         />
       </div>
    </section>
 </template>
@@ -23,32 +29,42 @@ export default {
          inputArea.setSelectionRange(val, val)
       },
 
-      checkExp(exp) {
-         if (exp === '()') {
-            this.setCursor(1)
+      // perser
+      pNumber({ parsed, rest }) {
+         const r = /(^[1-9]+)(.*)/
+         const result = rest.match(r)
+         if (!result) {
+            return { parsed: parsed, rest: rest }
+         } else {
+            return { parsed: parseInt(result[1]), rest: result[2] }
          }
+      },
+      parser(pd) {
+         const result = this.pNumber(pd)
+         if (result.parsed === null) {
+            return false
+         } else {
+            return result
+         }
+      },
+      parsed(pd) {
+         return pd.parsed
       },
    },
    computed: {
-      forming() {
-         if (this.exp === '(') {
-            this.exp = '()'
+      eval() {
+         const result = this.parser({ parsed: null, rest: this.inputstr })
+         if (!result) {
+            return 'Parser error!'
          }
 
-         if (this.exp === ')') {
-            this.exp = ''
-         }
-
-         return this.exp
+         const { parsed } = result
+         return parsed
       },
    },
 
-   updated() {
-      this.checkExp(this.exp)
-   },
-
    data: () => ({
-      exp: '',
+      inputstr: '',
    }),
 }
 </script>
