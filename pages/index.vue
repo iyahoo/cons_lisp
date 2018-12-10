@@ -11,12 +11,17 @@
             id="inputArea"
          />
          <v-text-field :value="eval" label="Output" outline readonly />
-         <v-text-field
-            :value="parsed(parser({ parsed: null, rest: this.inputstr }))"
-            label="test"
-            outline
-            readonly
-         />
+         <v-layout row wrap>
+            <v-flex xs12 md6 v-for="(t, i) in testings" :key="i">
+               <v-text-field
+                  :value="JSON.stringify(t.function(t.input))"
+                  :label="testToStr(t)"
+                  :background-color="testToColor(t)"
+                  outline
+                  readonly
+               />
+            </v-flex>
+         </v-layout>
       </div>
    </section>
 </template>
@@ -50,6 +55,28 @@ export default {
       parsed(pd) {
          return pd.parsed
       },
+
+      // test
+      testToStr(t) {
+         return 'expect: ' + JSON.stringify(t.expect)
+      },
+
+      testToColor(t) {
+         const actual = t.function(t.input)
+
+         return this.objectEquality(actual, t.function(t.input))
+            ? 'green'
+            : 'red'
+      },
+
+      objectEquality(a, b) {
+         // only for unnested object
+         let r = true
+         for (const k in a) {
+            r &= a[k] === b[k]
+         }
+         return r
+      },
    },
    computed: {
       eval() {
@@ -63,9 +90,25 @@ export default {
       },
    },
 
-   data: () => ({
-      inputstr: '',
-   }),
+   data() {
+      return {
+         inputstr: '',
+
+         // test
+         testings: [
+            {
+               input: { parsed: null, rest: '33' },
+               function: this.pNumber,
+               expect: { parsed: 33, rest: '' },
+            },
+            {
+               input: { parsed: null, rest: 'hoge' },
+               function: this.pNumber,
+               expect: { parsed: null, rest: 'hoge' },
+            },
+         ],
+      }
+   },
 }
 </script>
 
