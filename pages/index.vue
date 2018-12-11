@@ -12,7 +12,7 @@
          />
          <v-text-field :value="tryParser" label="Parsed" outline readonly />
          <h3>Tests</h3>
-         <v-layout row wrap>
+         <v-layout row wrap v-if="runTest">
             <v-flex xs12 md6 v-for="(t, i) in testings" :key="i">
                <h4>{{ t.name }}</h4>
                <v-text-field
@@ -38,7 +38,7 @@ export default {
 
       // perser
       pSpace({ parsed, rest }) {
-         const r = /\s+(.*)/
+         const r = /^\s+(.*)/
          const result = rest.match(r)
          if (!result) {
             return { parsed: parsed, rest: rest }
@@ -56,7 +56,7 @@ export default {
                return { parsed: parseInt(result[1]), rest: result[2] }
             } else {
                return this.parser({
-                  parsed: parsed.concat(parseInt(result[1])),
+                  parsed: parsed.concat([parseInt(result[1])]),
                   rest: result[2],
                })
             }
@@ -84,7 +84,7 @@ export default {
       },
       parser(pd) {
          const result = this.pList(this.pNumber(this.pSpace(pd)))
-         if (result.parsed === null) {
+         if (result.parsed === null || result.rest !== '') {
             throw new Error('parser error')
          } else {
             return result
@@ -111,20 +111,31 @@ export default {
          if (a === b) {
             return true
          }
+         if (Array.isArray(a) && Array.isArray(b)) {
+            if (a === b) return true
+            if (a == null || b == null) return false
+            if (a.length != b.length) return false
+
+            for (var i = 0; i < a.length; ++i) {
+               if (a[i] !== b[i]) return false
+            }
+            return true
+         }
          if (typeof a === 'object' && typeof b === 'object') {
             let r = true
             for (const k in a) {
-               r &= a[k] === b[k]
+               r &= this.objectEquality(a[k], b[k])
             }
             return r
          }
+
          return false
       },
    },
    computed: {
       tryParser() {
          try {
-		const input = this.inputstr
+            const input = this.inputstr
             const result = this.parser({ parsed: null, rest: input })
             const { parsed } = result
             return parsed
@@ -139,6 +150,7 @@ export default {
          inputstr: '',
 
          // test
+         runTest: true,
          testings: [
             {
                name: 'pNumber1',
@@ -170,6 +182,19 @@ export default {
                function: x => x,
                expect: false,
             },
+            {
+               name: 'check equality of arrays',
+               input: [1, 2, 3] === [1, 2, 3],
+               function: x => x,
+               expect: false,
+            },
+            {
+               name: 'check Array.isArray',
+               input: Array.isArray([1, 2, 3]) && Array.isArray([1, 2, 3]),
+               function: x => x,
+               expect: true,
+            },
+
             {
                name: 'pList1',
                input: { parsed: null, rest: '(1 2 3)' },
