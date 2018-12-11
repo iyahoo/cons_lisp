@@ -4,10 +4,9 @@
          <div slot="header">Test</div>
          <v-layout row wrap>
             <v-flex xs12 md12 v-for="(t, i) in testings" :key="i" class="px-2">
-               <h4>{{ t.name }}</h4>
-               <v-text-field
-                  :value="JSON.stringify(t.function(t.input))"
-                  :label="testToStr(t)"
+               <v-textarea
+                  :value="testToStr(t)"
+                  :label="t.name"
                   :background-color="testToColor(t)"
                   outline
                   readonly
@@ -25,7 +24,13 @@ export default {
    mixins: [LispInterpreter],
    methods: {
       testToStr(t) {
-         return 'expect: ' + JSON.stringify(t.expect)
+         return (
+            'expect: ' +
+            JSON.stringify(t.expect) +
+            '\n' +
+            'actual: ' +
+            JSON.stringify(t.function(t.input))
+         )
       },
 
       testResult(t) {

@@ -9,7 +9,7 @@
          rows="1"
          id="inputArea"
       />
-      <v-text-field :value="tryParser" label="Parsed" outline readonly />
+      <v-textarea :value="tryParser" label="Parsed" outline readonly />
    </div>
 </template>
 
