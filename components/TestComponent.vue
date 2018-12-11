@@ -24,26 +24,27 @@ export default {
    mixins: [LispInterpreter],
    methods: {
       testToStr(t) {
-         return (
-            'expect: ' +
-            JSON.stringify(t.expect) +
-            '\n' +
-            'actual: ' +
-            JSON.stringify(t.function(t.input))
-         )
+         try {
+            return (
+               'expect: ' +
+               JSON.stringify(t.expect) +
+               '\n' +
+               'actual: ' +
+               JSON.stringify(t.function(t.input))
+            )
+         } catch (e) {
+            return e
+         }
       },
 
       testResult(t) {
-         const actual = t.function(t.input)
-         const result = this.objectEquality(actual, t.expect)
-         if (!result) {
-            console.log(t.name)
-            console.log('actual')
-            console.log(actual)
-            console.log('expect')
-            console.log(JSON.stringify(t.expect))
+         try {
+            const actual = t.function(t.input)
+            const result = this.objectEquality(actual, t.expect)
+            return result
+         } catch (e) {
+            return false
          }
-         return result
       },
 
       testToColor(t) {
@@ -136,6 +137,19 @@ export default {
                function: this.pList,
                expect: {
                   parsed: [{ type: 'integer', value: '2' }],
+                  rest: '',
+               },
+            },
+            {
+               name: 'pList3',
+               input: { parsed: null, rest: '(2 (3) (3))' },
+               function: this.pList,
+               expect: {
+                  parsed: [
+                     { type: 'integer', value: '2' },
+                     [{ type: 'integer', value: '3' }],
+                     [{ type: 'integer', value: '3' }],
+                  ],
                   rest: '',
                },
             },
