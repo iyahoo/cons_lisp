@@ -33,7 +33,7 @@ export default {
                JSON.stringify(t.function(t.input))
             )
          } catch (e) {
-            return e
+            return 'expect: ' + JSON.stringify(t.expect) + '\n' + 'actual: ' + e
          }
       },
 
