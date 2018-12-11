@@ -50,7 +50,7 @@ module.exports = {
     ** Vuetify module configuration
     */
    vuetify: {
-      iconfont: 'fa',
+      iconfont: 'md',
       theme: {
          primary: '#1976D2',
          secondary: '#424242',
