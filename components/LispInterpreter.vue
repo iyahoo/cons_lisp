@@ -31,14 +31,15 @@ export default {
          if (!result) {
             return { parsed: parsed, rest: rest }
          } else {
+            const ast = { type: 'integer', value: result[1] }
             if (parsed === null) {
                return {
-                  parsed: { type: 'integer', value: result[1] },
+                  parsed: ast,
                   rest: result[2],
                }
             } else {
                return this.parser({
-                  parsed: parsed.concat([parseInt(result[1])]),
+                  parsed: parsed.concat([ast]),
                   rest: result[2],
                })
             }
@@ -87,16 +88,15 @@ export default {
             if (a.length != b.length) return false
 
             for (var i = 0; i < a.length; ++i) {
-               if (a[i] !== b[i]) return false
+               if (!this.objectEquality(a[i], b[i])) return false
             }
             return true
          }
          if (typeof a === 'object' && typeof b === 'object') {
-            let r = true
-            for (const k in a) {
-               r &= this.objectEquality(a[k], b[k])
+            for (let k in a) {
+               if (!this.objectEquality(a[k], b[k])) return false
             }
-            return r ? true : false
+            return true
          }
 
          return false
@@ -107,7 +107,7 @@ export default {
          try {
             const input = this.inputstr
             const result = this.parser({ parsed: null, rest: input })
-            return result.parsed
+            return JSON.stringify(result.parsed)
          } catch (e) {
             return e
          }

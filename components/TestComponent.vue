@@ -1,5 +1,5 @@
 <template>
-   <v-expansion-panel dark>
+   <v-expansion-panel v-model="exp" dark>
       <v-expansion-panel-content>
          <div slot="header">Test</div>
          <v-layout row wrap>
@@ -24,18 +24,30 @@ import LispInterpreter from '~/components/LispInterpreter'
 export default {
    mixins: [LispInterpreter],
    methods: {
-      // test
       testToStr(t) {
          return 'expect: ' + JSON.stringify(t.expect)
       },
 
-      testToColor(t) {
+      testResult(t) {
          const actual = t.function(t.input)
-         return this.objectEquality(actual, t.expect) ? 'green' : 'red'
+         const result = this.objectEquality(actual, t.expect)
+         if (!result) {
+            console.log(t.name)
+            console.log('actual')
+            console.log(actual)
+            console.log('expect')
+            console.log(JSON.stringify(t.expect))
+         }
+         return result
+      },
+
+      testToColor(t) {
+         return this.testResult(t) ? 'green' : 'red'
       },
    },
    data() {
       return {
+         exp: [true],
          testings: [
             {
                name: 'objectEquality',
@@ -47,12 +59,21 @@ export default {
                   }),
                expect: true,
             },
-
+            {
+               name: 'objectEquality2',
+               input: { parsed: { hoge: 1, fuga: 2 }, rest: '33' },
+               function: x =>
+                  this.objectEquality(x, {
+                     parsed: { hoge: 1, fuga: 2 },
+                     rest: '33',
+                  }),
+               expect: true,
+            },
             {
                name: 'pNumber1',
                input: { parsed: null, rest: '33' },
                function: this.pNumber,
-               expect: { parsed: 33, rest: '' },
+               expect: { parsed: { type: 'integer', value: '33' }, rest: '' },
             },
             {
                name: 'pNumber2',
@@ -95,7 +116,23 @@ export default {
                name: 'pList1',
                input: { parsed: null, rest: '(1 2 3)' },
                function: this.pList,
-               expect: { parsed: [1, 2, 3], rest: '' },
+               expect: {
+                  parsed: [
+                     { type: 'integer', value: '1' },
+                     { type: 'integer', value: '2' },
+                     { type: 'integer', value: '3' },
+                  ],
+                  rest: '',
+               },
+            },
+            {
+               name: 'pList2',
+               input: { parsed: null, rest: '(2)' },
+               function: this.pList,
+               expect: {
+                  parsed: [{ type: 'integer', value: '2' }],
+                  rest: '',
+               },
             },
          ],
       }
