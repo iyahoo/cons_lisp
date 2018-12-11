@@ -55,7 +55,7 @@ export default {
             if (parsed === null) {
                return { parsed: parseInt(result[1]), rest: result[2] }
             } else {
-               return parser({
+               return this.parser({
                   parsed: parsed.concat(parseInt(result[1])),
                   rest: result[2],
                })
@@ -63,12 +63,23 @@ export default {
          }
       },
       pList({ parsed, rest }) {
-         const r = /^\((.+)\)/
+         const r = /^\((.+)\)(.*)/
          const result = rest.match(r)
          if (!result) {
             return { parsed: parsed, rest: rest }
          } else {
-            return { parsed: parsed, rest: rest }
+            const inList = this.parser({
+               parsed: [],
+               rest: result[1],
+            })
+            if (parsed === null) {
+               return { parsed: inList.parsed, rest: inList.rest + result[2] }
+            } else {
+               return {
+                  parsed: parsed.concat(inList.parsed),
+                  rest: inList.rest + result[2],
+               }
+            }
          }
       },
       parser(pd) {
@@ -113,7 +124,8 @@ export default {
    computed: {
       tryParser() {
          try {
-            const result = this.parser({ parsed: null, rest: this.inputstr })
+		const input = this.inputstr
+            const result = this.parser({ parsed: null, rest: input })
             const { parsed } = result
             return parsed
          } catch (e) {
@@ -157,6 +169,12 @@ export default {
                input: null === '',
                function: x => x,
                expect: false,
+            },
+            {
+               name: 'pList1',
+               input: { parsed: null, rest: '(1 2 3)' },
+               function: this.pList,
+               expect: { parsed: [1, 2, 3], rest: '' },
             },
          ],
       }
