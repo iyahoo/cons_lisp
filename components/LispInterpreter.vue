@@ -52,20 +52,29 @@ export default {
             return context
          } else {
             let innerContext = { parsed: [], rest: result[1] }
-            this.parser(innerContext)
+            innerContext = this.parser(innerContext)
             if (context.parsed === null) {
-               context = innerContext
-               context.rest = context.rest + result[2]
+               context.parsed = innerContext.parsed
+               context.rest = innerContext.rest + result[2]
                return context
             } else {
                context.parsed = context.parsed.concat([innerContext.parsed])
-               context.rest = context.rest + result[2]
+               context.rest = innerContext.rest + result[2]
                return context
             }
          }
       },
       parser(context) {
-         const result = this.pList(this.pNumber(this.pSpace(context)))
+         console.log(context)
+         if (context.parsed !== null && context.rest === '') {
+            return context
+         }
+
+         let holder = context
+         holder = this.pSpace(holder)
+         holder = this.pNumber(holder)
+         holder = this.pList(holder)
+         const result = holder
 
          if (result.parsed === null || result.rest !== '') {
             throw new Error('parser error')
