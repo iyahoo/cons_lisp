@@ -27,7 +27,7 @@ export default {
          }
       },
       pNumber(context) {
-         const r = /(^[1-9]+)(.*)/
+         const r = /(^[0-9]+)(.*)/
          const result = context.rest.match(r)
          if (!result) {
             return context
