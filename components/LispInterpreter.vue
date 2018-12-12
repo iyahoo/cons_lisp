@@ -16,57 +16,57 @@
 <script>
 export default {
    methods: {
-      pSpace({ parsed, rest }) {
+      pSpace(context) {
          const r = /^\s+(.*)/
-         const result = rest.match(r)
+         const result = context.rest.match(r)
          if (!result) {
-            return { parsed: parsed, rest: rest }
+            return context
          } else {
-            return { parsed: parsed, rest: result[1] }
+            context.rest = result[1]
+            return context
          }
       },
-      pNumber({ parsed, rest }) {
+      pNumber(context) {
          const r = /(^[1-9]+)(.*)/
-         const result = rest.match(r)
+         const result = context.rest.match(r)
          if (!result) {
-            return { parsed: parsed, rest: rest }
+            return context
          } else {
             const ast = { type: 'integer', value: result[1] }
-            if (parsed === null) {
-               return {
-                  parsed: ast,
-                  rest: result[2],
-               }
+            if (context.parsed === null) {
+               context.parsed = ast
+               context.rest = result[2]
+               return context
             } else {
-               return this.parser({
-                  parsed: parsed.concat([ast]),
-                  rest: result[2],
-               })
+               context.parsed = context.parsed.concat([ast])
+               context.rest = result[2]
+               return this.parser(context)
             }
          }
       },
-      pList({ parsed, rest }) {
+      pList(context) {
          const r = /^\((.+)\)(.*)/
-         const result = rest.match(r)
+         //const r = /^\((.+)/
+         const result = context.rest.match(r)
          if (!result) {
-            return { parsed: parsed, rest: rest }
+            return context
          } else {
-            const inList = this.parser({
-               parsed: [],
-               rest: result[1],
-            })
-            if (parsed === null) {
-               return { parsed: inList.parsed, rest: inList.rest + result[2] }
+            let innerContext = { parsed: [], rest: result[1] }
+            this.parser(innerContext)
+            if (context.parsed === null) {
+               context = innerContext
+               context.rest = context.rest + result[2]
+               return context
             } else {
-               return {
-                  parsed: parsed.concat([inList.parsed]),
-                  rest: inList.rest + result[2],
-               }
+               context.parsed = context.parsed.concat([innerContext.parsed])
+               context.rest = context.rest + result[2]
+               return context
             }
          }
       },
-      parser(pd) {
-         const result = this.pList(this.pNumber(this.pSpace(pd)))
+      parser(context) {
+         const result = this.pList(this.pNumber(this.pSpace(context)))
+
          if (result.parsed === null || result.rest !== '') {
             throw new Error('parser error')
          } else {
@@ -74,8 +74,8 @@ export default {
          }
       },
 
-      parsed(pd) {
-         return pd.parsed
+      parsed(context) {
+         return context.parsed
       },
 
       objectEquality(a, b) {
@@ -106,7 +106,8 @@ export default {
       tryParser() {
          try {
             const input = this.inputstr
-            const result = this.parser({ parsed: null, rest: input })
+            let context = { parsed: null, rest: input }
+            const result = this.parser(context)
             return JSON.stringify(result.parsed)
          } catch (e) {
             return e
