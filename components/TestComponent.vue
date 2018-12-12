@@ -5,6 +5,7 @@
          <v-layout row wrap>
             <v-flex xs12 md12 v-for="(t, i) in testings" :key="i" class="px-2">
                <v-textarea
+                  v-if="!testResult(t)"
                   :value="testToStr(t)"
                   :label="t.name"
                   :background-color="testToColor(t)"
