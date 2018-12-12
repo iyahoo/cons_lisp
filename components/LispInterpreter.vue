@@ -65,7 +65,6 @@ export default {
          }
       },
       parser(context) {
-         console.log(context)
          if (context.parsed !== null && context.rest === '') {
             return context
          }
