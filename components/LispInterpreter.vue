@@ -45,23 +45,35 @@ export default {
          }
       },
       pList(context) {
-         const r = /^\((.+)\)(.*)/
-         //const r = /^\((.+)/
-         const result = context.rest.match(r)
-         if (!result) {
-            return context
-         } else {
-            let innerContext = { parsed: [], rest: result[1] }
+         const r = /^\((.+)/
+         let headResult = context.rest.match(r)
+         if (headResult) {
+            let innerContext = {
+               parsed: [],
+               rest: headResult[1],
+               depth: context.depth + 1,
+            }
             innerContext = this.parser(innerContext)
             if (context.parsed === null) {
                context.parsed = innerContext.parsed
-               context.rest = innerContext.rest + result[2]
-               return context
             } else {
                context.parsed = context.parsed.concat([innerContext.parsed])
-               context.rest = innerContext.rest + result[2]
+            }
+            context.rest = innerContext.rest
+            return context
+         } else if (!headResult && context.depth !== 0) {
+            const r = /^\)(.*)/
+            let endResult = context.rest.match(r)
+
+            if (!endResult) {
+               throw new Error('parser error: no match brackets')
+            } else {
+               context.rest = endResult[1]
+               context.depth = context.depth - 1
                return context
             }
+         } else {
+            return context
          }
       },
       parser(context) {
@@ -75,8 +87,12 @@ export default {
          holder = this.pList(holder)
          const result = holder
 
-         if (result.parsed === null || result.rest !== '') {
+         if (result.parsed === null) {
             throw new Error('parser error')
+         } else if (result.rest !== '') {
+            throw new Error('parser error: unexpected token ' + result.rest[0])
+         } else if (result.depth !== 0) {
+            throw new Error('parser error: no match brackets')
          } else {
             return result
          }
@@ -114,7 +130,7 @@ export default {
       tryParser() {
          try {
             const input = this.inputstr
-            let context = { parsed: null, rest: input }
+            let context = { parsed: null, rest: input, depth: 0 }
             const result = this.parser(context)
             return JSON.stringify(result.parsed)
          } catch (e) {
@@ -124,6 +140,7 @@ export default {
    },
    data() {
       return {
+         onDebug: true,
          inputstr: '',
       }
    },

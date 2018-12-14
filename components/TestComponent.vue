@@ -25,16 +25,23 @@ export default {
    mixins: [LispInterpreter],
    methods: {
       testToStr(t) {
+         let expect = t.expect
+         let input = JSON.stringify(t.input)
+         if (!(expect instanceof Error) || typeof t.expect === 'object') {
+            expect = JSON.stringify(t.expect)
+         }
          try {
             return (
+               'inpet: ' +
+               input +
                'expect: ' +
-               JSON.stringify(t.expect) +
+               expect +
                '\n' +
                'actual: ' +
                JSON.stringify(t.function(t.input))
             )
          } catch (e) {
-            return 'expect: ' + JSON.stringify(t.expect) + '\n' + 'actual: ' + e
+            return 'input: ' + input + '\nexpect: ' + expect + '\nactual: ' + e
          }
       },
 
@@ -121,7 +128,7 @@ export default {
 
             {
                name: 'pList1',
-               input: { parsed: null, rest: '(1 2 3)' },
+               input: { parsed: null, rest: '(1 2 3)', depth: 0 },
                function: this.pList,
                expect: {
                   parsed: [
@@ -130,20 +137,22 @@ export default {
                      { type: 'integer', value: '3' },
                   ],
                   rest: '',
+                  depth: 0,
                },
             },
             {
                name: 'pList2',
-               input: { parsed: null, rest: '(2)' },
+               input: { parsed: null, rest: '(2)', depth: 0 },
                function: this.pList,
                expect: {
                   parsed: [{ type: 'integer', value: '2' }],
                   rest: '',
+                  depth: 0,
                },
             },
             {
                name: 'pList3',
-               input: { parsed: null, rest: '(2 (3) (3))' },
+               input: { parsed: null, rest: '(2 (3) (3))', depth: 0 },
                function: this.pList,
                expect: {
                   parsed: [
@@ -152,7 +161,14 @@ export default {
                      [{ type: 'integer', value: '3' }],
                   ],
                   rest: '',
+                  depth: 0,
                },
+            },
+            {
+               name: 'pList4 Error',
+               input: { parsed: null, rest: '(2', depth: 0 },
+               function: this.pList,
+               expect: Error('perser error: no match brackets'),
             },
          ],
       }
