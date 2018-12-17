@@ -32,7 +32,7 @@ export default {
          }
          try {
             return (
-               'inpet: ' +
+               'input: ' +
                input +
                'expect: ' +
                expect +
