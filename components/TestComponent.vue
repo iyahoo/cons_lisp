@@ -182,6 +182,22 @@ export default {
                   depth: 0,
                },
             },
+		{
+			name: 'pList5',
+			input: { parsed: null, rest: '(1 (2)())', depth: 0 },
+			function: this.pList,
+			expect: {
+				parsed: [
+					{ type: 'integer', value: '1' },
+					[
+						{ type: 'integer', value: '2' },
+					],
+					[],
+				],
+				rest: '',
+				depth: 0,
+			}
+		},
             {
                name: 'pList4 Error',
                input: { parsed: null, rest: '(2', depth: 0 },
