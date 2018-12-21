@@ -34,6 +34,7 @@ export default {
             return (
                'input: ' +
                input +
+               '\n' +
                'expect: ' +
                expect +
                '\n' +
@@ -159,6 +160,23 @@ export default {
                      { type: 'integer', value: '2' },
                      [{ type: 'integer', value: '3' }],
                      [{ type: 'integer', value: '3' }],
+                  ],
+                  rest: '',
+                  depth: 0,
+               },
+            },
+            {
+               name: 'pList4',
+               input: { parsed: null, rest: '(1 (2 (3)) (4))', depth: 0 },
+               function: this.pList,
+               expect: {
+                  parsed: [
+                     { type: 'integer', value: '1' },
+                     [
+                        { type: 'integer', value: '2' },
+                        [{ type: 'integer', value: '3' }],
+                     ],
+                     [{ type: 'integer', value: '4' }],
                   ],
                   rest: '',
                   depth: 0,

@@ -17,16 +17,23 @@
 export default {
    methods: {
       pSpace(context) {
+         console.log('pSpace')
+         console.table(context)
          const r = /^\s+(.*)/
          const result = context.rest.match(r)
          if (!result) {
             return context
          } else {
-            context.rest = result[1]
-            return context
+            return {
+               parsed: context.parsed,
+               rest: result[1],
+               depth: context.depth,
+            }
          }
       },
       pNumber(context) {
+         console.log('pNumber')
+         console.table(context)
          const r = /(^[0-9]+)(.*)/
          const result = context.rest.match(r)
          if (!result) {
@@ -34,49 +41,78 @@ export default {
          } else {
             const ast = { type: 'integer', value: result[1] }
             if (context.parsed === null) {
-               context.parsed = ast
-               context.rest = result[2]
-               return context
+               return this.parser({
+                  parsed: ast,
+                  rest: result[2],
+                  depth: context.depth,
+               })
             } else {
-               context.parsed = context.parsed.concat([ast])
-               context.rest = result[2]
-               return this.parser(context)
+               return this.parser({
+                  parsed: context.parsed.concat([ast]),
+                  rest: result[2],
+                  depth: context.depth,
+               })
             }
          }
       },
       pList(context) {
-         const r = /^\((.+)/
+         console.log('pList')
+         console.table(context)
+         const r = /^\((.*)/
          let headResult = context.rest.match(r)
          if (headResult) {
-            let innerContext = {
+            const innerContext = {
                parsed: [],
                rest: headResult[1],
                depth: context.depth + 1,
             }
-            innerContext = this.parser(innerContext)
+            console.log('in to ' + innerContext.depth)
+            const innerContextParsed = this.parser(innerContext)
+            console.log('out from ' + innerContext.depth)
             if (context.parsed === null) {
-               context.parsed = innerContext.parsed
+               return this.parser({
+                  parsed: innerContextParsed.parsed,
+                  rest: innerContextParsed.rest,
+                  depth: innerContextParsed.depth,
+               })
             } else {
-               context.parsed = context.parsed.concat([innerContext.parsed])
+               return this.parser({
+                  parsed: context.parsed.concat([innerContextParsed.parsed]),
+                  rest: innerContextParsed.rest,
+                  depth: innerContextParsed.depth,
+               })
             }
-            context.rest = innerContext.rest
-            return context
          } else if (!headResult && context.depth !== 0) {
+            console.log('in else if')
+            console.table(context)
             const r = /^\)(.*)/
             let endResult = context.rest.match(r)
 
             if (!endResult) {
-               throw new Error('parser error: no match brackets')
+               if (context.rest !== '') {
+                  return context
+               } else {
+                  throw new Error('parser error: no match brackets!!')
+               }
             } else {
-               context.rest = endResult[1]
-               context.depth = context.depth - 1
-               return context
+               console.log('in else if else')
+               const resultContext = {
+                  parsed: context.parsed,
+                  rest: endResult[1],
+                  depth: context.depth - 1,
+               }
+               console.log('resultContext')
+               console.table(resultContext)
+               return resultContext
             }
          } else {
             return context
          }
       },
       parser(context) {
+         console.log('parser top')
+         //console.table(context)
+
          if (context.parsed !== null && context.rest === '') {
             return context
          }
@@ -87,15 +123,7 @@ export default {
          holder = this.pList(holder)
          const result = holder
 
-         if (result.parsed === null) {
-            throw new Error('parser error')
-         } else if (result.rest !== '') {
-            throw new Error('parser error: unexpected token ' + result.rest[0])
-         } else if (result.depth !== 0) {
-            throw new Error('parser error: no match brackets')
-         } else {
-            return result
-         }
+         return result
       },
 
       parsed(context) {
@@ -129,9 +157,19 @@ export default {
    computed: {
       tryParser() {
          try {
+            console.log('tryParser')
             const input = this.inputstr
-            let context = { parsed: null, rest: input, depth: 0 }
+            const context = { parsed: null, rest: input, depth: 0 }
             const result = this.parser(context)
+            if (result.parsed === null) {
+               throw new Error('parser error')
+            } else if (result.rest !== '') {
+               throw new Error(
+                  'parser error: unexpected token ' + result.rest[0]
+               )
+            } else if (result.depth !== 0) {
+               throw new Error('parser error: no match brackets')
+            }
             return JSON.stringify(result.parsed)
          } catch (e) {
             return e
