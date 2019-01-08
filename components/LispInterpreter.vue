@@ -64,11 +64,7 @@ export default {
             }
             const innerContextParsed = this.parser(innerContext)
             if (context.parsed === null) {
-               return this.parser({
-                  parsed: innerContextParsed.parsed,
-                  rest: innerContextParsed.rest,
-                  depth: innerContextParsed.depth,
-               })
+               return this.parser(innerContextParsed)
             } else {
                return this.parser({
                   parsed: context.parsed.concat([innerContextParsed.parsed]),
