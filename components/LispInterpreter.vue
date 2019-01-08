@@ -17,8 +17,6 @@
 export default {
    methods: {
       pSpace(context) {
-         console.log('pSpace')
-         console.table(context)
          const r = /^\s+(.*)/
          const result = context.rest.match(r)
          if (!result) {
@@ -32,8 +30,6 @@ export default {
          }
       },
       pNumber(context) {
-         console.log('pNumber')
-         console.table(context)
          const r = /(^[0-9]+)(.*)/
          const result = context.rest.match(r)
          if (!result) {
@@ -66,9 +62,7 @@ export default {
                rest: headResult[1],
                depth: context.depth + 1,
             }
-            console.log('in to ' + innerContext.depth)
             const innerContextParsed = this.parser(innerContext)
-            console.log('out from ' + innerContext.depth)
             if (context.parsed === null) {
                return this.parser({
                   parsed: innerContextParsed.parsed,
@@ -110,9 +104,6 @@ export default {
          }
       },
       parser(context) {
-         console.log('parser top')
-         //console.table(context)
-
          if (context.parsed !== null && context.rest === '') {
             return context
          }
