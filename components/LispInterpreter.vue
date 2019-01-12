@@ -15,15 +15,18 @@
 
 <script>
 export default {
-	computed: {
-		trySynAna() {
-			return this.inputstr
-		},
+	methods: {
+		syntaxAnalyzer()
 	},
-	data() {
-		return {
-			inputstr: '',
-		}
-	}
+   computed: {
+      trySynAna() {
+         return this.inputstr
+      },
+   },
+   data() {
+      return {
+         inputstr: '',
+      }
+   },
 }
 </script>
